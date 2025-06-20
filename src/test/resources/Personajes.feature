@@ -9,7 +9,6 @@ Feature: Manejo de API personajes ejemplos
     Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters'
     When method get
     Then status 200
-    And match response == '#[1]'
     And match response[0].id == 1
     And match response[0].name == 'Iron Man'
     And match response[0].alterego == 'Tony Stark'
@@ -39,3 +38,25 @@ Feature: Manejo de API personajes ejemplos
     When method get
     Then status 404
     And match response == { error: '#string' }
+
+  @id:4 @CrearPersonaje
+  Scenario: Crear personaje (exitoso)
+    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters'
+    And request
+      """
+      {
+        "name": "Iron Man1",
+        "alterego": "Tony Stark",
+        "description": "Genius billionaire",
+        "powers": ["Armor", "Flight"]
+      }
+      """
+    When method post
+    Then status 201
+    And match response.name == "Iron Man1"
+    And match response.alterego == "Tony Stark"
+    And match response.description == "Genius billionaire"
+    And match response.powers contains "Armor"
+    And match response.powers contains "Flight"
+    And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
+    And match response contains schemaValidate
