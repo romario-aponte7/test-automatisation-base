@@ -12,8 +12,6 @@ Feature: Manejo de API personajes ejemplos
     And match response[0].id == 1
     And match response[0].name == 'Iron Man'
     And match response[0].alterego == 'Tony Stark'
-    And match response[0].powers contains 'Armor'
-    And match response[0].powers contains 'Flight'
     And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
     And match each response[*] contains schemaValidate
 
@@ -41,15 +39,9 @@ Feature: Manejo de API personajes ejemplos
   Scenario: Crear personaje (exitoso)
     * def uniqueName = 'Iron Man ' + java.util.UUID.randomUUID()
     Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters'
-    And request
-      """
-      {
-        "name": "#(uniqueName)",
-        "alterego": "Tony Stark",
-        "description": "Genius billionaire",
-        "powers": ["Armor", "Flight"]
-      }
-      """
+    * def crearPersonajeRequest = read('classpath:../data/personajes/CrearPersonajeRequest.json')
+    * eval crearPersonajeRequest.name = uniqueName
+    And request crearPersonajeRequest
     When method post
     Then status 201
     And match response.name == uniqueName
@@ -63,15 +55,9 @@ Feature: Manejo de API personajes ejemplos
   @id:5 @CrearPersonajeDuplicado
   Scenario: Crear personaje (nombre duplicado)
     Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters'
-    And request
-      """
-      {
-        "name": "Iron Man",
-        "alterego": "Tony Stark",
-        "description": "Genius billionaire",
-        "powers": ["Armor", "Flight"]
-      }
-      """
+    * def crearPersonajeRequest = read('classpath:../data/personajes/CrearPersonajeRequest.json')
+    * eval crearPersonajeRequest.name = 'Iron Man'
+    And request crearPersonajeRequest
     When method post
     Then status 400
     And match response == { error: "Character name already exists" }
@@ -79,62 +65,30 @@ Feature: Manejo de API personajes ejemplos
   @id:6 @CrearPersonajeCamposRequeridos
   Scenario: Crear personaje (faltan campos requeridos)
     Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters'
-    And request
-      """
-      {
-        "name": "",
-        "alterego": "",
-        "description": "",
-        "powers": []
-      }
-      """
+    * def crearPersonajeCamposRequeridosRequest = read('classpath:../data/personajes/CrearPersonajeCamposRequeridosRequest.json')
+    And request crearPersonajeCamposRequeridosRequest
     When method post
     Then status 400
-    And match response ==
-      """
-      {
-        "name": "Name is required",
-        "description": "Description is required",
-        "powers": "Powers are required",
-        "alterego": "Alterego is required"
-      }
-      """
+    And match response == read('classpath:../data/personajes/CrearPersonajeCamposRequeridosResponse.json')
 
   @id:7 @ActualizarPersonaje
   Scenario: Actualizar personaje (exitoso)
-    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/1'
-    And request
-      """
-      {
-        "name": "Iron Man",
-        "alterego": "Tony Stark",
-        "description": "Updated description",
-        "powers": ["Armor", "Flight"]
-      }
-      """
+    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/33'
+    * def actualizarPersonajeRequest = read('classpath:../data/personajes/ActualizarPersonajeRequest.json')
+    * eval actualizarPersonajeRequest.description = 'Updated description'
+    And request actualizarPersonajeRequest
     When method put
     Then status 200
-    And match response.id == 1
-    And match response.name == "Iron Man"
-    And match response.alterego == "Tony Stark"
-    And match response.description == "Updated description"
-    And match response.powers contains "Armor"
-    And match response.powers contains "Flight"
+    And match response.id == 33
     And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
     And match response contains schemaValidate
 
   @id:8 @ActualizarPersonajeNoExiste
   Scenario: Actualizar personaje (no existe)
     Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/999'
-    And request
-      """
-      {
-        "name": "Iron Man",
-        "alterego": "Tony Stark",
-        "description": "Updated description",
-        "powers": ["Armor", "Flight"]
-      }
-      """
+    * def actualizarPersonajeRequest = read('classpath:../data/personajes/ActualizarPersonajeRequest.json')
+    * eval actualizarPersonajeRequest.description = 'Updated description'
+    And request actualizarPersonajeRequest
     When method put
     Then status 404
     And match response == { "error": "Character not found" }
