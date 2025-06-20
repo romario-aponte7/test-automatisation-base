@@ -12,7 +12,6 @@ Feature: Manejo de API personajes ejemplos
     And match response[0].id == 1
     And match response[0].name == 'Iron Man'
     And match response[0].alterego == 'Tony Stark'
-    And match response[0].description == 'Genius billionaire'
     And match response[0].powers contains 'Armor'
     And match response[0].powers contains 'Flight'
     And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
@@ -26,7 +25,6 @@ Feature: Manejo de API personajes ejemplos
     And match response.id == 1
     And match response.name == 'Iron Man'
     And match response.alterego == 'Tony Stark'
-    And match response.description == 'Genius billionaire'
     And match response.powers contains 'Armor'
     And match response.powers contains 'Flight'
     And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
@@ -101,3 +99,26 @@ Feature: Manejo de API personajes ejemplos
         "alterego": "Alterego is required"
       }
       """
+
+  @id:7 @ActualizarPersonaje
+  Scenario: Actualizar personaje (exitoso)
+    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/1'
+    And request
+      """
+      {
+        "name": "Iron Man",
+        "alterego": "Tony Stark",
+        "description": "Updated description",
+        "powers": ["Armor", "Flight"]
+      }
+      """
+    When method put
+    Then status 200
+    And match response.id == 1
+    And match response.name == "Iron Man"
+    And match response.alterego == "Tony Stark"
+    And match response.description == "Updated description"
+    And match response.powers contains "Armor"
+    And match response.powers contains "Flight"
+    And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
+    And match response contains schemaValidate
