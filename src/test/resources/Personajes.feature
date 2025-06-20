@@ -122,3 +122,19 @@ Feature: Manejo de API personajes ejemplos
     And match response.powers contains "Flight"
     And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
     And match response contains schemaValidate
+
+  @id:8 @ActualizarPersonajeNoExiste
+  Scenario: Actualizar personaje (no existe)
+    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/999'
+    And request
+      """
+      {
+        "name": "Iron Man",
+        "alterego": "Tony Stark",
+        "description": "Updated description",
+        "powers": ["Armor", "Flight"]
+      }
+      """
+    When method put
+    Then status 404
+    And match response == { "error": "Character not found" }
