@@ -77,3 +77,27 @@ Feature: Manejo de API personajes ejemplos
     When method post
     Then status 400
     And match response == { error: "Character name already exists" }
+
+  @id:6 @CrearPersonajeCamposRequeridos
+  Scenario: Crear personaje (faltan campos requeridos)
+    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters'
+    And request
+      """
+      {
+        "name": "",
+        "alterego": "",
+        "description": "",
+        "powers": []
+      }
+      """
+    When method post
+    Then status 400
+    And match response ==
+      """
+      {
+        "name": "Name is required",
+        "description": "Description is required",
+        "powers": "Powers are required",
+        "alterego": "Alterego is required"
+      }
+      """
