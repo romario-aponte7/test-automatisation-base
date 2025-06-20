@@ -141,9 +141,13 @@ Feature: Manejo de API personajes ejemplos
 
   @id:9 @EliminarPersonaje
   Scenario: Eliminar personaje (exitoso)
-    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/6'
-    When method delete
-    Then status 204
+    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters'
+    When method get
+    Then status 200
+    * def lastId = response[response.length - 1].id
+    And url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/' + lastId
+    And method delete
+    And status 204
 
   @id:10 @EliminarPersonajeNoExiste
   Scenario: Eliminar personaje (no existe)
