@@ -32,3 +32,10 @@ Feature: Manejo de API personajes ejemplos
     And match response.powers contains 'Flight'
     And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
     And match response contains schemaValidate
+
+  @id:3 @ObtenerPersonajePorIdNoExiste
+  Scenario: Obtener personaje por ID (no existe)
+    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/999'
+    When method get
+    Then status 404
+    And match response == { error: '#string' }
