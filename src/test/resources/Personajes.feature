@@ -41,11 +41,12 @@ Feature: Manejo de API personajes ejemplos
 
   @id:4 @CrearPersonaje
   Scenario: Crear personaje (exitoso)
+    * def uniqueName = 'Iron Man ' + java.util.UUID.randomUUID()
     Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters'
     And request
       """
       {
-        "name": "Iron Man1",
+        "name": "#(uniqueName)",
         "alterego": "Tony Stark",
         "description": "Genius billionaire",
         "powers": ["Armor", "Flight"]
@@ -53,10 +54,26 @@ Feature: Manejo de API personajes ejemplos
       """
     When method post
     Then status 201
-    And match response.name == "Iron Man1"
+    And match response.name == uniqueName
     And match response.alterego == "Tony Stark"
     And match response.description == "Genius billionaire"
     And match response.powers contains "Armor"
     And match response.powers contains "Flight"
     And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
     And match response contains schemaValidate
+
+  @id:5 @CrearPersonajeDuplicado
+  Scenario: Crear personaje (nombre duplicado)
+    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters'
+    And request
+      """
+      {
+        "name": "Iron Man",
+        "alterego": "Tony Stark",
+        "description": "Genius billionaire",
+        "powers": ["Armor", "Flight"]
+      }
+      """
+    When method post
+    Then status 400
+    And match response == { error: "Character name already exists" }
