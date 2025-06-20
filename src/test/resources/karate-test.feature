@@ -73,13 +73,13 @@ Feature: Manejo de API personajes ejemplos
 
   @id:7 @ActualizarPersonaje
   Scenario: Actualizar personaje (exitoso)
-    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/1'
+    Given url 'http://bp-se-test-cabcd9b246a5.herokuapp.com/romario/api/characters/33'
     * def actualizarPersonajeRequest = read('classpath:../data/personajes/ActualizarPersonajeRequest.json')
     * eval actualizarPersonajeRequest.description = 'Updated description'
     And request actualizarPersonajeRequest
     When method put
     Then status 200
-    And match response.id == 1
+    And match response.id == 33
     And def schemaValidate = read('classpath:../data/personajes/DataSchemaPersonajes.json')
     And match response contains schemaValidate
 
