@@ -8,5 +8,4 @@ class KarateBasicTest {
     Karate testBasic() {
         return Karate.run("classpath:karate-test.feature");
     }
-
 }
